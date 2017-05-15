@@ -1,6 +1,6 @@
 {
   "name": "webpack-s3-uploader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Uploads compiled assets to s3 during webpack build",
   "main": "s3_uploader.js",
   "scripts": {
