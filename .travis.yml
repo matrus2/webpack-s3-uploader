@@ -5,3 +5,4 @@ cache: yarn
 script:
   - yarn run security
   - yarn run lint
+  - yarn run test
