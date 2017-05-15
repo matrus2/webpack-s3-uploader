@@ -54,15 +54,9 @@ It is required to set:
 - `output.path` is a path, where all assets will be compiled and those will be uploaded. You can use `exclude` and `include` option. 
 - `output.publicPath` it is a path, where all compiled assets will be referenced to. During a compilation process webpack replace local path with this one. 
 
-
-      // Only upload css and js
-      include: /.*\.(css|js)/,
-
-
-
 ### Options
 
-- `exclude`: A Pattern to match for excluded content. Behaves similarly to webpack's loader configuration.
+- `exclude`: A Pattern to match for excluded content (e.g. `/.*\.(css|js)/`). Behaves similarly to webpack's loader configuration.
 - `include`: A Pattern to match for included content. Behaves the same as the `exclude`.
 - `s3Options`: Provide keys for upload extention of [s3Config](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property)
 - `s3UploadOptions`: Provide upload options [putObject](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property )

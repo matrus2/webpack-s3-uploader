@@ -5,7 +5,10 @@
   "main": "s3_uploader.js",
   "scripts": {
     "test": "NODE_ENV='test' mocha -t 10000",
-    "lint": "eslint ./s3_plugin.js ./test"
+    "lint": "eslint ./s3_plugin.js ./test",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish"
   },
   "repository": {
     "type": "git",
