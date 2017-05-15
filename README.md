@@ -69,4 +69,4 @@ It is required to set:
 
 ##### Acknowledges
 
-This is lite version of [s3-plugin-webpack](https://github.com/MikaAK/s3-plugin-webpack) 
+This is a lite version of [s3-plugin-webpack](https://github.com/MikaAK/s3-plugin-webpack) 

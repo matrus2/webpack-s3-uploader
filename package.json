@@ -46,6 +46,7 @@
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",
     "mocha": "^3.3.0",
+    "nsp": "^2.6.3",
     "raw-loader": "^0.5.1",
     "sinon": "^2.2.0",
     "webpack": "^2.5.1"
