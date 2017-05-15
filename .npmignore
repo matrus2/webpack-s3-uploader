@@ -1,0 +1,4 @@
+test
+.env
+.env.sample
+.travis.yml
