@@ -2,7 +2,7 @@
 S3 Uploader for Webpack
 ===
 
-This will upload all compiled assets to AWS S3 bucket during a webpack build process. 
+This will upload all compiled assets to AWS S3 bucket during a webpack build process. You can serve all your files via Cloud Front or different CDN.
 
 ### Installation
 
@@ -47,12 +47,11 @@ const config = {
   ]
   // ..other configuration
 }
-```
+```  
 
-#####Notes:
 It is required to set:  
 - `output.path` is a path, where all assets will be compiled and those will be uploaded. You can use `exclude` and `include` option. 
-- `output.publicPath` it is a path, where all compiled assets will be referenced to. During a compilation process webpack replace local path with this one. 
+- `output.publicPath` it is a path, where all compiled assets will be referenced to. During a compilation process webpack replaces local path with this one. If you have Cloud Front pointed to your S3 bucket, you should put url here. 
 
 ### Options
 
