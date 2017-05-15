@@ -3,5 +3,5 @@ node_js:
 - 7
 cache: yarn
 script:
-  - nsp check
-  - npm run lint
+  - yarn run security
+  - yarn run lint
