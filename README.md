@@ -1,6 +1,8 @@
 
 S3 Uploader for Webpack
-===
+===  
+
+[![Build Status](https://travis-ci.org/matrus2/webpack-s3-uploader.svg?branch=master)](https://travis-ci.org/matrus2/webpack-s3-uploader)  
 
 This will upload all compiled assets to AWS S3 bucket during a webpack build process. You can serve all your files via Cloud Front or different CDN.
 
