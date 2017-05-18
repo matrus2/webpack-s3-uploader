@@ -2,8 +2,9 @@
 S3 Uploader for Webpack
 ===  
 
-[![Build Status](https://travis-ci.org/matrus2/webpack-s3-uploader.svg?branch=master)](https://travis-ci.org/matrus2/webpack-s3-uploader)  
-
+[![Build Status](https://travis-ci.org/matrus2/webpack-s3-uploader.svg?branch=master)](https://travis-ci.org/matrus2/webpack-s3-uploader) 
+[![NSP Status](https://nodesecurity.io/orgs/matrus/projects/9163c5b1-e10a-43c0-9889-27f7ad71ec8f/badge)](https://nodesecurity.io/orgs/matrus/projects/9163c5b1-e10a-43c0-9889-27f7ad71ec8f)  
+  
 This will upload all compiled assets to AWS S3 bucket during a webpack build process. You can serve all your files via Cloud Front or different CDN.
 
 ### Installation
@@ -69,6 +70,6 @@ It is required to set:
 `include` and `exclude` rules behave similarly to Webpack's loader options.  In addition to a RegExp you can pass a function which will be called with the path as its first argument.  Returning a truthy value will match the rule.  You can also pass an Array of rules, all of which must pass for the file to be included or excluded.
 
 
-##### Acknowledges
+##### Acknowledgements
 
-This is a lite version of [s3-plugin-webpack](https://github.com/MikaAK/s3-plugin-webpack) 
+This is a lite and refactored version of [s3-plugin-webpack](https://github.com/MikaAK/s3-plugin-webpack)
