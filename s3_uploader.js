@@ -30,7 +30,7 @@ const testRule = (rule, subject) => {
 
 const handleErrors = (error, compilation, cb) => {
   compilation.errors.push(new Error(error));
-  cb();
+  cb(new Error(error));
 };
 
 const isIgnoredFile = file => _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
