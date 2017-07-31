@@ -34,7 +34,7 @@
     "aws-sdk": "^2.49.0",
     "lodash": "^4.17.4",
     "progress": "^2.0.0",
-    "s3": "^4.4.0"
+    "s3-node-client": "^4.4.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
