@@ -1,4 +1,4 @@
-const s3 = require('s3');
+const s3 = require('s3-node-client');
 const ProgressBar = require('progress');
 const _ = require('lodash');
 const aws = require('aws-sdk');
