@@ -54,7 +54,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       https.get(url, (response) => {
         let body = '';
-        response.on('data', data => (body += data));
+        response.on('data', data => (body += data)); // eslint-disable-line no-return-assign
         response.on('end', () => resolve(body));
         response.on('error', reject);
       });
