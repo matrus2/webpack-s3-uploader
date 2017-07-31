@@ -137,8 +137,12 @@ module.exports = {
   runWebpackConfig({ config }) {
     this.createOutputPath();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       webpack(config, (err, stats) => {
+        if (err) {
+          reject(err);
+          return;
+        }
         if (stats.toJson().errors.length) {
           resolve({ errors: stats.toJson().errors });
         } else {
