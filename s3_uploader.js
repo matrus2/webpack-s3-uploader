@@ -2,6 +2,7 @@ const s3 = require('s3-client');
 const ProgressBar = require('progress');
 const _ = require('lodash');
 const aws = require('aws-sdk');
+const fs = require('fs');
 
 const UPLOAD_IGNORES = [
   '.DS_Store',
@@ -35,8 +36,27 @@ const handleErrors = (error, compilation, cb) => {
 
 const isIgnoredFile = file => _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
 
-const getAssetFiles = ({ assets }) => {
-  const files = _.map(assets, (value, name) => ({ name, path: value.existsAt }));
+const parse = (base) => {
+  const scan = folder =>
+    fs
+      .readdirSync(folder)
+      .reduce(
+        (a, v) => (
+          fs.statSync(`${folder}/${v}`).isDirectory()
+            ? a.concat(scan(`${folder}/${v}`))
+            : a.concat([
+              [`${folder}/${v}`.replace(`${base}/`, ''), `${folder}/${v}`],
+            ])
+        ),
+        [],
+      );
+
+  return scan(base);
+};
+const getAssetFiles = ({ assets }, directory) => {
+  const files = directory
+    ? parse(directory).map(([name, path]) => ({ name, path }))
+    : _.map(assets, (value, name) => ({ name, path: value.existsAt }));
 
   return Promise.resolve(files);
 };
@@ -46,6 +66,7 @@ module.exports = class S3Plugin {
     const {
       include,
       exclude,
+      directory,
       progress,
       s3Options = {},
       s3UploadOptions = {},
@@ -61,6 +82,7 @@ module.exports = class S3Plugin {
       include,
       exclude,
       basePath,
+      directory: fs.existsSync(directory) || undefined,
       progress: _.isBoolean(progress) ? progress : true,
     };
 
@@ -74,17 +96,13 @@ module.exports = class S3Plugin {
     this.connect();
     const hasRequiredUploadOpts = _.every(REQUIRED_S3_UP_OPTS, type => this.uploadOptions[type]);
 
-    this.options.directory = compiler.options.output.path ||
-      compiler.options.output.context ||
-      '.';
-
     compiler.plugin('after-emit', (compilation, cb) => {
       if (!hasRequiredUploadOpts) {
         const error = `S3Plugin-RequiredS3UploadOpts: ${REQUIRED_S3_UP_OPTS.join(', ')}`;
         handleErrors(error, compilation, cb);
       }
 
-      getAssetFiles(compilation)
+      getAssetFiles(compilation, this.options.directory)
         .then(files => this.filterAllowedFiles(files))
         .then(files => this.uploadFiles(files))
         .then(() => this.invalidateCloudfront())
