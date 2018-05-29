@@ -5,8 +5,8 @@ const webpack = require('webpack');
 const fs = require('fs');
 const s3Opts = require('./s3_options');
 const S3WebpackPlugin = require('./../s3_uploader');
-const assert = require('chai').assert;
-const spawnSync = require('child_process').spawnSync;
+const { assert } = require('chai');
+const { spawnSync } = require('child_process');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const S3_URL = s3Opts.AWS_S3_URL;
@@ -206,7 +206,9 @@ module.exports = {
 
   assertFileMatches(files) {
     const errors = _(files)
-      .map(({ expected, actual, name, s3Url }) =>
+      .map(({
+        expected, actual, name, s3Url,
+      }) =>
         assert.equal(actual, expected, `File: ${name} URL: ${s3Url} - NO MATCH ${expected} ------ ${actual}`))
       .compact()
       .value();
