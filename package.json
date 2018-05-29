@@ -6,7 +6,6 @@
   "scripts": {
     "test": "NODE_ENV='test' mocha -t 10000",
     "lint": "eslint ./s3_plugin.js ./test",
-    "security": "nsp check --summary",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
