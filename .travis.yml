@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-- 7
+- 9
 cache: yarn
 script:
-  - yarn run security
   - yarn run lint
   - yarn run test
