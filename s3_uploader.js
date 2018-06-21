@@ -210,11 +210,11 @@ module.exports = class S3Plugin {
             },
           },
         }, (err, res) => {
-			if(err) {
-              console.log('\n[ERROR] error crating cloudfront invalidation: ' + err);
-			}
+          if (err) {
+            console.log('\n[ERROR] error creating cloudfront invalidation: ' + err);
+          }
 
-            err ? reject(err) : resolve(res.Id);
+          err ? reject(err) : resolve(res.Id);
         });
       }
       return resolve(null);
