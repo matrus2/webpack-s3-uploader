@@ -181,7 +181,7 @@ module.exports = class S3Plugin {
     });
 
     const promise = new Promise((resolve, reject) => {
-      upload.on('error', reject);
+      upload.on('error', (err) => reject('\nfailed uplaoding file: ' + file + ' err: ' + err));
       upload.on('end', () => resolve(file));
     });
 
@@ -193,10 +193,11 @@ module.exports = class S3Plugin {
 
     return new Promise((resolve, reject) => {
       if (cloudfrontInvalidateOptions.DistributionId) {
-        const { accessKeyId, secretAccessKey } = clientConfig.s3Options;
+        const { accessKeyId, secretAccessKey, sessionToken } = clientConfig.s3Options;
         const cloudfront = new aws.CloudFront({
           accessKeyId,
           secretAccessKey,
+          sessionToken
         });
 
         cloudfront.createInvalidation({
@@ -208,7 +209,13 @@ module.exports = class S3Plugin {
               Items: cloudfrontInvalidateOptions.Items,
             },
           },
-        }, (err, res) => (err ? reject(err) : resolve(res.Id)));
+        }, (err, res) => {
+          if (err) {
+            console.log('\n[ERROR] error creating cloudfront invalidation: ' + err);
+          }
+
+          err ? reject(err) : resolve(res.Id);
+        });
       }
       return resolve(null);
     });
