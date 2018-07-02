@@ -41,7 +41,8 @@ const config = {
       s3Options: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        region: 'us-west-1'
+        region: 'us-west-1',
+        sessionToken: 'asdsaad' // the optional AWS session token to sign requests with
       },
       s3UploadOptions: {
         Bucket: 'MyBucket'
