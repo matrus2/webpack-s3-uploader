@@ -162,7 +162,8 @@ module.exports = class S3Plugin {
 
   uploadFile(fileName, file) {
     /*
-     * assets not output to the webpack config output dir will have relative file name format
+     * assets not output to the webpack config output dir will have relative file name format, and ../ will crash the uploader
+     * so we need to scrub them out
      *
      * example: output dir:                  dist/bundle
      *          file-loader produced output: dist/assets/someimage.png
