@@ -111,7 +111,7 @@ build
 |
 ----- assets
       |
-	   ---- myasset.png
+       ---- myasset.png
 
 and will be pathed in S3 as follows
 
