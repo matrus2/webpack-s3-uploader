@@ -13,19 +13,18 @@ const S3_URL = s3Opts.AWS_S3_URL;
 const S3_ERROR_REGEX = /<Error>/;
 const OUTPUT_FILE_NAME = 's3Test';
 const OUTPUT_PATH = path.resolve(__dirname, '.tmp');
-const OUTPUT_PATH_ALT = path.join(__dirname, '.tmp/bundle');
 const FIXTURES_PATH = path.resolve(__dirname, 'fixtures');
 const ENTRY_PATH = path.resolve(__dirname, 'fixtures/index.js');
 const createBuildFailError = errors => `Webpack Build Failed ${errors}`;
 
 const ASSET_FILE_NAME_PATTERN = '[name]@[hash].[ext]';
-const ASSET_PATH= '/assets';
-const ASSET_OUTPUT_RELATIVE_PATH= '..' + ASSET_PATH;
+const ASSET_PATH = '/assets';
+const ASSET_OUTPUT_RELATIVE_PATH = `..${ASSET_PATH}`;
 
 const deleteFolderRecursive = (folder) => {
   if (fs.existsSync(folder)) {
     fs.readdirSync(folder).forEach((file) => {
-      const curPath = `${folder}/${file}`;
+      const curPath = path.join(folder, file);
 
       if (fs.lstatSync(curPath).isDirectory()) { // recurse
         deleteFolderRecursive(curPath);
@@ -51,7 +50,6 @@ const generateS3Config = (config) => {
 module.exports = {
   OUTPUT_FILE_NAME,
   OUTPUT_PATH,
-  OUTPUT_PATH_ALT,
   S3_URL,
   S3_ERROR_REGEX,
   FIXTURES_PATH,
@@ -98,12 +96,9 @@ module.exports = {
 
   cleanOutputDirectory() {
     deleteFolderRecursive(OUTPUT_PATH);
-	deleteFolderRecursive(OUTPUT_PATH_ALT);
   },
 
-  createOutputPath(outputPath) {
-    outputPath = outputPath || OUTPUT_PATH;
-
+  createOutputPath(outputPath = OUTPUT_PATH) {
     if (!fs.existsSync(outputPath)) {
       fs.mkdirSync(outputPath);
     }
@@ -143,7 +138,7 @@ module.exports = {
     }, config);
   },
 
-  createWebpackConfigAlt({ config, s3Config } = {}) {
+  createAlternatePathingWebpackConfig({ config, s3Config } = {}) {
     return _.extend({
       entry: ENTRY_PATH,
       module: {
@@ -160,7 +155,7 @@ module.exports = {
         generateS3Config(s3Config),
       ],
       output: {
-        path: OUTPUT_PATH_ALT,
+        path: OUTPUT_PATH,
         filename: `${OUTPUT_FILE_NAME}-[hash]-${+new Date()}.js`,
       },
     }, config);

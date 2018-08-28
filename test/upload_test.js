@@ -27,14 +27,6 @@ describe('S3 Webpack Upload', () => {
         .then(assertFileMatches);
     });
 
-    it('uploads entire directory with alternate pathing s3', () => { // eslint-disable-line
-      config = testHelpers.createWebpackConfigAlt({ s3Config });
-
-      return testHelpers.runWebpackConfig({ config })
-        .then(testHelpers.testForFailFromDirectoryOrGetS3Files(testHelpers.OUTPUT_PATH_ALT))
-        .then(assertFileMatches);
-    });
-
     it('uploads build to s3 with basePath', () => {
       const BASE_PATH = 'test';
       s3Config = { basePath: BASE_PATH };
@@ -44,6 +36,25 @@ describe('S3 Webpack Upload', () => {
       testHelpers.createOutputPath();
       return testHelpers.runWebpackConfig({ config })
         .then(testHelpers.testForFailFromDirectoryOrGetS3Files(testHelpers.OUTPUT_PATH, BASE_PATH))
+        .then(assertFileMatches);
+    });
+  });
+
+  describe('With directory and alternate pathing', () => {
+    let s3Config;
+    let config;
+
+    beforeEach(() => {
+      config = testHelpers.createWebpackConfig({ s3Config });
+      testHelpers.createOutputPath();
+    });
+
+    it('uploads entire directory with alternate s3 pathing', () => { // eslint-disable-line
+      config = testHelpers
+        .createAlternatePathingWebpackConfig({ s3Config });
+
+      return testHelpers.runWebpackConfig({ config })
+        .then(testHelpers.testForFailFromDirectoryOrGetS3Files(testHelpers.OUTPUT_PATH))
         .then(assertFileMatches);
     });
   });
