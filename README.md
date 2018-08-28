@@ -102,6 +102,7 @@ rules [
 
 The above configuration will output to the local file system as follows
 
+```javascript
 build
 |
 ----- dest
@@ -120,6 +121,7 @@ my-bucket
 ---- assets
      |
       ---- myasset.png
+```
 
 ##### Acknowledgements
 
