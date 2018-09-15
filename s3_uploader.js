@@ -161,6 +161,16 @@ module.exports = class S3Plugin {
   }
 
   uploadFile(fileName, file) {
+    /*
+     * assets not output to the webpack config output dir will have relative file name format, and ../ will crash the uploader
+     * so we need to scrub them out
+     *
+     * example: output dir:                  dist/bundle
+     *          file-loader produced output: dist/assets/someimage.png
+     *          fileName:                    ../assets/someimage.png
+     */
+    fileName = fileName.split('../').join('');
+
     let Key = this.options.basePath + fileName;
     const s3Params = _.mapValues(this.uploadOptions, optionConfig =>
       (_.isFunction(optionConfig) ? optionConfig(fileName, file) : optionConfig));
@@ -181,7 +191,7 @@ module.exports = class S3Plugin {
     });
 
     const promise = new Promise((resolve, reject) => {
-      upload.on('error', (err) => reject('\nfailed uplaoding file: ' + file + ' err: ' + err));
+      upload.on('error', (err) => reject('\nfailed uplaoding file: ' + file + ' with Key ' + Key + ' err: ' + err));
       upload.on('end', () => resolve(file));
     });
 

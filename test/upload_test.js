@@ -40,6 +40,25 @@ describe('S3 Webpack Upload', () => {
     });
   });
 
+  describe('With directory and alternate pathing', () => {
+    let s3Config;
+    let config;
+
+    beforeEach(() => {
+      config = testHelpers.createWebpackConfig({ s3Config });
+      testHelpers.createOutputPath();
+    });
+
+    it('uploads entire directory with alternate s3 pathing', () => { // eslint-disable-line
+      config = testHelpers
+        .createAlternatePathingWebpackConfig({ s3Config });
+
+      return testHelpers.runWebpackConfig({ config })
+        .then(testHelpers.testForFailFromDirectoryOrGetS3Files(testHelpers.OUTPUT_PATH))
+        .then(assertFileMatches);
+    });
+  });
+
   it('starts a CloudFront invalidation', () => {
     const s3Config = {
       cloudfrontInvalidateOptions: testHelpers.getCloudfrontInvalidateOptions(),

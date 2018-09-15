@@ -17,10 +17,14 @@ const FIXTURES_PATH = path.resolve(__dirname, 'fixtures');
 const ENTRY_PATH = path.resolve(__dirname, 'fixtures/index.js');
 const createBuildFailError = errors => `Webpack Build Failed ${errors}`;
 
+const ASSET_FILE_NAME_PATTERN = '[name]@[hash].[ext]';
+const ASSET_PATH = '/assets';
+const ASSET_OUTPUT_RELATIVE_PATH = `..${ASSET_PATH}`;
+
 const deleteFolderRecursive = (folder) => {
   if (fs.existsSync(folder)) {
     fs.readdirSync(folder).forEach((file) => {
-      const curPath = `${folder}/${file}`;
+      const curPath = path.join(folder, file);
 
       if (fs.lstatSync(curPath).isDirectory()) { // recurse
         deleteFolderRecursive(curPath);
@@ -94,9 +98,9 @@ module.exports = {
     deleteFolderRecursive(OUTPUT_PATH);
   },
 
-  createOutputPath() {
-    if (!fs.existsSync(OUTPUT_PATH)) {
-      fs.mkdirSync(OUTPUT_PATH);
+  createOutputPath(outputPath = OUTPUT_PATH) {
+    if (!fs.existsSync(outputPath)) {
+      fs.mkdirSync(outputPath);
     }
   },
 
@@ -134,8 +138,31 @@ module.exports = {
     }, config);
   },
 
+  createAlternatePathingWebpackConfig({ config, s3Config } = {}) {
+    return _.extend({
+      entry: ENTRY_PATH,
+      module: {
+        loaders: [{
+          test: /\.png/,
+          loader: `file-loader?name=${ASSET_FILE_NAME_PATTERN}?publicPath=${ASSET_PATH}&outputPath=${ASSET_OUTPUT_RELATIVE_PATH}`,
+        }, {
+          test: /\.css$/,
+          loader: ExtractTextPlugin.extract('css-loader'),
+        }],
+      },
+      plugins: [
+        new ExtractTextPlugin('styles/styles.css'),
+        generateS3Config(s3Config),
+      ],
+      output: {
+        path: OUTPUT_PATH,
+        filename: `${OUTPUT_FILE_NAME}-[hash]-${+new Date()}.js`,
+      },
+    }, config);
+  },
+
   runWebpackConfig({ config }) {
-    this.createOutputPath();
+    this.createOutputPath(config.output.path);
 
     return new Promise((resolve, reject) => {
       webpack(config, (err, stats) => {

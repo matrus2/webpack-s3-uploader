@@ -71,6 +71,58 @@ It is required to set:
 `include` and `exclude` rules behave similarly to Webpack's loader options.  In addition to a RegExp you can pass a function which will be called with the path as its first argument.  Returning a truthy value will match the rule.  You can also pass an Array of rules, all of which must pass for the file to be included or excluded.
 
 
+##### Pathing for resources outside of output.path
+Resources that are located outside of the webpack output.path directory are pathed as follows
+
+```javascript
+output.path = /myproject/build/dist/bundle
+```
+
+```javascript
+const ASSET_OUTPUT_PATH =/myproject/build/assets
+
+or
+
+const ASSET_OUTPUT_PATH =../assets
+
+...
+
+rules [
+  use: [
+    ...,
+    {
+      loader: 'file-loader',
+      options: {
+        ...,
+        outputPath: ASSET_OUTPUT_PATH
+      }
+    }
+]
+```
+
+The above configuration will output to the local file system as follows
+
+```javascript
+build
+|
+----- dest
+      |
+       ---- bundle.js
+|
+----- assets
+      |
+       ---- myasset.png
+
+and will be pathed in S3 as follows
+
+my-bucket
+|
+---- bundle.js
+---- assets
+     |
+      ---- myasset.png
+```
+
 ##### Acknowledgements
 
 This is a lite and refactored version of [s3-plugin-webpack](https://github.com/MikaAK/s3-plugin-webpack)
