@@ -3,9 +3,7 @@ const ProgressBar = require('progress');
 const _ = require('lodash');
 const aws = require('aws-sdk');
 
-const UPLOAD_IGNORES = [
-  '.DS_Store',
-];
+const UPLOAD_IGNORES = ['.DS_Store'];
 
 const DEFAULT_UPLOAD_OPTIONS = {
   ACL: 'public-read',
@@ -13,7 +11,8 @@ const DEFAULT_UPLOAD_OPTIONS = {
 
 const REQUIRED_S3_UP_OPTS = ['Bucket'];
 
-const addTrailingS3Sep = fPath => (fPath ? fPath.replace(/\/?(\?|#|$)/, '/$1') : fPath);
+const addTrailingS3Sep = fPath => // eslint-disable-line no-confusing-arrow
+  fPath ? fPath.replace(/\/?(\?|#|$)/, '/$1') : fPath;
 
 const testRule = (rule, subject) => {
   if (_.isRegExp(rule)) {
@@ -33,10 +32,14 @@ const handleErrors = (error, compilation, cb) => {
   cb(new Error(error));
 };
 
-const isIgnoredFile = file => _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
+const isIgnoredFile = file =>
+  _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
 
 const getAssetFiles = ({ assets }) => {
-  const files = _.map(assets, (value, name) => ({ name, path: value.existsAt }));
+  const files = _.map(assets, (value, name) => ({
+    name,
+    path: value.existsAt,
+  }));
 
   return Promise.resolve(files);
 };
@@ -72,11 +75,13 @@ module.exports = class S3Plugin {
 
   apply(compiler) {
     this.connect();
-    const hasRequiredUploadOpts = _.every(REQUIRED_S3_UP_OPTS, type => this.uploadOptions[type]);
+    const hasRequiredUploadOpts = _.every(
+      REQUIRED_S3_UP_OPTS,
+      type => this.uploadOptions[type],
+    );
 
-    this.options.directory = compiler.options.output.path ||
-      compiler.options.output.context ||
-      '.';
+    this.options.directory =
+      compiler.options.output.path || compiler.options.output.context || '.';
 
     compiler.plugin('after-emit', (compilation, cb) => {
       if (!hasRequiredUploadOpts) {
@@ -125,9 +130,10 @@ module.exports = class S3Plugin {
     const progressAmount = Array(uploadFiles.length);
     const progressTotal = Array(uploadFiles.length);
     let progressTracker = 0;
-    const calculateProgress = () => _.sum(progressAmount) / _.sum(progressTotal);
+    const calculateProgress = () =>
+      _.sum(progressAmount) / _.sum(progressTotal);
     const countUndefined = array =>
-      _.reduce(array, (res, value) => res += _.isUndefined(value) ? 1 : 0, 0); // eslint-disable-line
+      _.reduce(array, (res, value) => (res += _.isUndefined(value) ? 1 : 0), 0); // eslint-disable-line
 
     const progressBar = new ProgressBar('Uploading [:bar] :percent :etas', {
       complete: ' ',
@@ -151,7 +157,8 @@ module.exports = class S3Plugin {
   }
 
   uploadFiles(files = []) {
-    const uploadFiles = files.map(file => this.uploadFile(file.name, file.path));
+    const uploadFiles = files.map(file =>
+      this.uploadFile(file.name, file.path));
 
     if (this.options.progress) {
       this.setupProgressBar(uploadFiles);
@@ -162,18 +169,22 @@ module.exports = class S3Plugin {
 
   uploadFile(fileName, file) {
     /*
-     * assets not output to the webpack config output dir will have relative file name format, and ../ will crash the uploader
-     * so we need to scrub them out
-     *
-     * example: output dir:                  dist/bundle
-     *          file-loader produced output: dist/assets/someimage.png
-     *          fileName:                    ../assets/someimage.png
-     */
+         * assets not output to the webpack config output dir will have relative file name format, and ../ will crash the uploader
+         * so we need to scrub them out
+         *
+         * example: output dir:                  dist/bundle
+         *          file-loader produced output: dist/assets/someimage.png
+         *          fileName:                    ../assets/someimage.png
+         */
+    // eslint-disable-next-line no-param-reassign
     fileName = fileName.split('../').join('');
 
     let Key = this.options.basePath + fileName;
-    const s3Params = _.mapValues(this.uploadOptions, optionConfig =>
-      (_.isFunction(optionConfig) ? optionConfig(fileName, file) : optionConfig));
+    const s3Params = _.mapValues(
+      this.uploadOptions,
+      optionConfig => // eslint-disable-line no-confusing-arrow
+        _.isFunction(optionConfig) ? optionConfig(fileName, file) : optionConfig,
+    );
 
     // avoid noname folders in bucket
     if (Key[0] === '/') {
@@ -191,7 +202,8 @@ module.exports = class S3Plugin {
     });
 
     const promise = new Promise((resolve, reject) => {
-      upload.on('error', (err) => reject('\nfailed uplaoding file: ' + file + ' with Key ' + Key + ' err: ' + err));
+      upload.on('error', err =>
+        reject(`failed uplaoding file: ${file} with Key ${Key} err: ${err}`)); // eslint-disable-line prefer-promise-reject-errors
       upload.on('end', () => resolve(file));
     });
 
@@ -203,29 +215,35 @@ module.exports = class S3Plugin {
 
     return new Promise((resolve, reject) => {
       if (cloudfrontInvalidateOptions.DistributionId) {
-        const { accessKeyId, secretAccessKey, sessionToken } = clientConfig.s3Options;
+        const {
+          accessKeyId,
+          secretAccessKey,
+          sessionToken,
+        } = clientConfig.s3Options;
         const cloudfront = new aws.CloudFront({
           accessKeyId,
           secretAccessKey,
-          sessionToken
+          sessionToken,
         });
 
-        cloudfront.createInvalidation({
-          DistributionId: cloudfrontInvalidateOptions.DistributionId,
-          InvalidationBatch: {
-            CallerReference: Date.now().toString(),
-            Paths: {
-              Quantity: cloudfrontInvalidateOptions.Items.length,
-              Items: cloudfrontInvalidateOptions.Items,
+        cloudfront.createInvalidation(
+          {
+            DistributionId: cloudfrontInvalidateOptions.DistributionId,
+            InvalidationBatch: {
+              CallerReference: Date.now().toString(),
+              Paths: {
+                Quantity: cloudfrontInvalidateOptions.Items.length,
+                Items: cloudfrontInvalidateOptions.Items,
+              },
             },
           },
-        }, (err, res) => {
-          if (err) {
-            console.log('\n[ERROR] error creating cloudfront invalidation: ' + err);
-          }
-
-          err ? reject(err) : resolve(res.Id);
-        });
+          (err, res) => {
+            if (err) {
+              console.log(`\n[ERROR] error creating cloudfront invalidation:  ${err}`); // eslint-disable-line no-console
+            }
+            err ? reject(err) : resolve(res.Id); // eslint-disable-line no-unused-expressions
+          },
+        );
       }
       return resolve(null);
     });

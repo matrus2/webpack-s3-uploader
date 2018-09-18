@@ -5,7 +5,7 @@
   "main": "s3_uploader.js",
   "scripts": {
     "test": "NODE_ENV='test' mocha -t 10000",
-    "lint": "eslint ./s3_plugin.js ./test",
+    "lint": "eslint ./s3_uploader.js ./test",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
@@ -40,7 +40,7 @@
     "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.11",
     "dotenv": "^5.0.1",
-    "eslint": "^4.19.1",
+    "eslint": "^5.6.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.12.0",
     "extract-text-webpack-plugin": "^3.0.0",
