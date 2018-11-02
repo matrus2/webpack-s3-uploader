@@ -3,7 +3,6 @@ S3 Uploader for Webpack
 ===  
 
 [![Build Status](https://travis-ci.org/matrus2/webpack-s3-uploader.svg?branch=master)](https://travis-ci.org/matrus2/webpack-s3-uploader) 
-[![NSP Status](https://nodesecurity.io/orgs/matrus/projects/9163c5b1-e10a-43c0-9889-27f7ad71ec8f/badge)](https://nodesecurity.io/orgs/matrus/projects/9163c5b1-e10a-43c0-9889-27f7ad71ec8f)  
   
 This will upload all compiled assets to AWS S3 bucket during a webpack build process. You can serve all your files via Cloud Front or different CDN.
 
