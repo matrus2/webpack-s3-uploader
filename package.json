@@ -30,17 +30,17 @@
   },
   "homepage": "https://github.com/matrus2/webpack-s3-uploader",
   "dependencies": {
-    "aws-sdk": "^2.247.1",
+    "aws-sdk": "^2.469.0",
     "lodash": "^4.17.10",
-    "progress": "^2.0.0",
-    "s3-client": "^4.4.1"
+    "progress": "^2.0.3",
+    "s3-client": "^4.4.2"
   },
   "devDependencies": {
     "chai": "^4.1.0",
     "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^0.28.11",
+    "css-loader": "^2.1.1",
     "dotenv": "^5.0.1",
-    "eslint": "^5.6.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.12.0",
     "extract-text-webpack-plugin": "^3.0.0",
