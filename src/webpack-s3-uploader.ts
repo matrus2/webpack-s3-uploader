@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import aws from 'aws-sdk';
 import { RuleSetCondition, Compiler, compilation } from 'webpack';
 
-const PLUGIN_NAME = 'WebpackS3UploaderPlugin';
+export const PLUGIN_NAME = 'WebpackS3UploaderPlugin';
 
 const UPLOAD_IGNORES = ['.DS_Store'];
 
@@ -34,7 +34,7 @@ const testRule = (rule: RuleSetCondition, subject: string): any => {
     return new RegExp(rule).test(subject);
   }
 
-  throw new Error('Invalid include / exclude rule');
+  throw new TypeError('Invalid include / exclude rule');
 };
 
 type AssetFile = {
@@ -266,7 +266,11 @@ export default class S3Plugin {
 
     const promise: Promise<string> = new Promise((resolve, reject) => {
       upload.on('error', (err: Error) =>
-        reject(`failed uplaoding file: ${filePath} with Key ${Key} err: ${err}`)
+        reject(
+          new Error(
+            `${PLUGIN_NAME}: failed to upload file ${filePath} with Key ${Key}. Error: ${err}`
+          )
+        )
       ); // eslint-disable-line prefer-promise-reject-errors
       upload.on('end', () => resolve(filePath));
     });
@@ -277,43 +281,43 @@ export default class S3Plugin {
   invalidateCloudfront() {
     const { clientConfig, cloudfrontInvalidateOptions } = this;
 
-    return new Promise((resolve, reject) => {
-      if (cloudfrontInvalidateOptions.DistributionId) {
-        const {
-          accessKeyId,
-          secretAccessKey,
-          sessionToken,
-        } = clientConfig.s3Options;
-        const cloudfront = new aws.CloudFront({
-          accessKeyId,
-          secretAccessKey,
-          sessionToken,
-        });
+    if (!cloudfrontInvalidateOptions.DistributionId) {
+      return Promise.resolve(null);
+    }
 
-        cloudfront.createInvalidation(
-          {
-            DistributionId: cloudfrontInvalidateOptions.DistributionId,
-            InvalidationBatch: {
-              CallerReference: Date.now().toString(),
-              Paths: {
-                Quantity: cloudfrontInvalidateOptions.Items.length,
-                Items: cloudfrontInvalidateOptions.Items,
-              },
+    return new Promise((resolve, reject) => {
+      const {
+        accessKeyId,
+        secretAccessKey,
+        sessionToken,
+      } = clientConfig.s3Options;
+      const cloudfront = new aws.CloudFront({
+        accessKeyId,
+        secretAccessKey,
+        sessionToken,
+      });
+
+      cloudfront.createInvalidation(
+        {
+          DistributionId: cloudfrontInvalidateOptions.DistributionId,
+          InvalidationBatch: {
+            CallerReference: Date.now().toString(),
+            Paths: {
+              Quantity: cloudfrontInvalidateOptions.Items.length,
+              Items: cloudfrontInvalidateOptions.Items,
             },
           },
-          (err, res) => {
-            if (err) {
-              reject(err);
-            } else if (!res.Invalidation) {
-              reject(new Error('Empty invalidation response'));
-            } else {
-              resolve(res.Invalidation.Id);
-            }
+        },
+        (err, res) => {
+          if (err) {
+            reject(err);
+          } else if (!res.Invalidation) {
+            reject(new Error('Empty invalidation response'));
+          } else {
+            resolve(res.Invalidation.Id);
           }
-        );
-      }
-
-      return resolve(null);
+        }
+      );
     });
   }
 }
