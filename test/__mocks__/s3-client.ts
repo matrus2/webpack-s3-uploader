@@ -22,13 +22,13 @@ class FakeClient {
       uploader.progressAmount = 53;
       uploader.progressTotal = 73;
       uploader.emit('progress');
-    }, 1);
+    }, 0);
 
     setTimeout(() => {
       uploader.progressAmount = 27;
       uploader.progressTotal = 100;
       uploader.emit('progress');
-    }, 2);
+    }, 0);
 
     setTimeout(() => {
       uploader.emit('end');
@@ -36,7 +36,7 @@ class FakeClient {
         localFile,
         s3Path: s3Params.Bucket + '/' + s3Params.Key,
       });
-    }, 3);
+    }, 5);
 
     return uploader;
   }
