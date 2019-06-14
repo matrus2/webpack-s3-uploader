@@ -1,18 +1,33 @@
 {
   "name": "webpack-s3-uploader",
-  "version": "1.3.1",
+  "version": "0.0.0-development",
   "description": "Uploads compiled assets to s3 during webpack build",
-  "main": "s3_uploader.js",
+  "main": "dist/webpack-s3-uploader.umd.js",
+  "module": "dist/webpack-s3-uploader.es5.js",
+  "typings": "dist/types/webpack-s3-uploader.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "NODE_ENV='test' mocha -t 10000",
-    "lint": "eslint ./s3_uploader.js ./test",
-    "publish:patch": "npm version patch && npm publish",
-    "publish:minor": "npm version minor && npm publish",
-    "publish:major": "npm version major && npm publish"
+    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "prebuild": "rimraf dist",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts",
+    "start": "rollup -c rollup.config.ts -w",
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
+    "test:prod": "npm run lint && npm run test -- --no-cache",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release",
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "precommit": "lint-staged",
+    "travis-deploy-once": "travis-deploy-once",
+    "prepush": "npm run test:prod && npm run build",
+    "commitmsg": "commitlint -E HUSKY_GIT_PARAMS"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:matrus2/webpack-s3-uploader.git"
+    "url": "https:git@github.com:matrus2/webpack-s3-uploader.git"
   },
   "keywords": [
     "s3",
@@ -29,25 +44,115 @@
     "url": "https://github.com/matrus2/webpack-s3-uploader"
   },
   "homepage": "https://github.com/matrus2/webpack-s3-uploader",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "lint-staged": {
+    "{src,test}/**/*.ts": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    },
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverageFrom": [
+      "src/*.{js,ts}"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "dependencies": {
-    "aws-sdk": "^2.469.0",
-    "lodash": "^4.17.10",
-    "progress": "^2.0.3",
-    "s3-client": "^4.4.2"
+    "@types/aws-sdk": "2.7.0",
+    "@types/lodash": "4.14.134",
+    "@types/progress": "2.0.3",
+    "@types/webpack": "4.4.32",
+    "aws-sdk": "2.474.0",
+    "lodash": "4.17.11",
+    "pretty-quick": "1.11.0",
+    "progress": "2.0.3",
+    "s3-client": "4.4.2"
   },
   "devDependencies": {
-    "chai": "^4.1.0",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^2.1.1",
-    "dotenv": "^5.0.1",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.12.0",
-    "extract-text-webpack-plugin": "^3.0.0",
-    "file-loader": "^1.1.11",
-    "mocha": "^5.2.0",
-    "raw-loader": "^0.5.1",
-    "sinon": "^2.2.0",
-    "webpack": "^3.11.0"
+    "@commitlint/cli": "^7.1.2",
+    "@commitlint/config-conventional": "^7.1.2",
+    "@types/jest": "^23.3.2",
+    "@types/node": "11.13.14",
+    "@types/rollup-plugin-json": "3.0.2",
+    "@types/rollup-plugin-sourcemaps": "0.4.2",
+    "colors": "^1.3.2",
+    "commitizen": "^3.0.0",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
+    "extract-text-webpack-plugin": "3.0.2",
+    "file-loader": "4.0.0",
+    "husky": "^1.0.1",
+    "jest": "24.8.0",
+    "jest-config": "24.8.0",
+    "jest-fixtures": "0.6.0",
+    "lint-staged": "^8.0.0",
+    "prettier": "^1.14.3",
+    "prompt": "^1.0.0",
+    "replace-in-file": "^3.4.2",
+    "rimraf": "^2.6.2",
+    "rollup": "1.15.2",
+    "rollup-plugin-commonjs": "^9.1.8",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "5.0.2",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.18.0",
+    "semantic-release": "^15.13.16",
+    "shelljs": "^0.8.3",
+    "travis-deploy-once": "^5.0.9",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.2.0",
+    "tslint": "5.17.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-config-standard": "8.0.1",
+    "typescript": "3.5.1",
+    "webpack": "4.34.0"
   }
 }
