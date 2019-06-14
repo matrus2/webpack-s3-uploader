@@ -64,7 +64,7 @@ It is required to set:
 
 ##### Advanced `include` and `exclude rules`
 
-`include` and `exclude` rules behave similarly to Webpack's loader options. In addition to a RegExp you can pass a function which will be called with the path as its first argument. Returning a truthy value will match the rule. You can also pass an Array of rules, all of which must pass for the file to be included or excluded.
+`include` and `exclude` rules behave similarly to Webpack's loader options. In addition to a RegExp you can pass a function which will be called with the path as its first argument. Returning a truthy value will match the rule. You can also pass an Array of rules (matching any).
 
 ##### Pathing for resources outside of output.path
 
