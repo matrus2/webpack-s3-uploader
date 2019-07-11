@@ -2,6 +2,7 @@ const s3 = require('s3-client');
 const ProgressBar = require('progress');
 const _ = require('lodash');
 const aws = require('aws-sdk');
+const packageJson = require('./package.json');
 
 const UPLOAD_IGNORES = ['.DS_Store'];
 
@@ -83,7 +84,7 @@ module.exports = class S3Plugin {
     this.options.directory =
       compiler.options.output.path || compiler.options.output.context || '.';
 
-    compiler.plugin('after-emit', (compilation, cb) => {
+    compiler.hooks.afterEmit.tapAsync(packageJson.name, (compilation, cb) => {
       if (!hasRequiredUploadOpts) {
         const error = `S3Plugin-RequiredS3UploadOpts: ${REQUIRED_S3_UP_OPTS.join(', ')}`;
         handleErrors(error, compilation, cb);
