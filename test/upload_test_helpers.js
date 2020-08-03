@@ -198,7 +198,8 @@ module.exports = {
           }
 
           return out;
-        }, []);    }).call(this, directory);
+        }, []);
+    }).call(this, directory);
 
     return res
       .map(file => file.replace(basePath, ''));
