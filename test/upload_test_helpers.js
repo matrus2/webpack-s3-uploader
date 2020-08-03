@@ -4,7 +4,7 @@ const path = require('path');
 const webpack = require('webpack');
 const fs = require('fs');
 const s3Opts = require('./s3_options');
-const S3WebpackPlugin = require('./../s3_uploader');
+const S3WebpackPlugin = require('../s3_uploader');
 const { assert } = require('chai');
 const { spawnSync } = require('child_process');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -119,13 +119,19 @@ module.exports = {
     return _.extend({
       entry: ENTRY_PATH,
       module: {
-        loaders: [{
-          test: /\.png/,
-          loader: 'file-loader?name=[name]-[hash].[ext]',
-        }, {
-          test: /\.css$/,
-          loader: ExtractTextPlugin.extract('css-loader'),
-        }],
+        rules: [
+          {
+            test: /\.png/,
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            }
+          },
+          {
+            test: /\.css$/,
+            loader: ExtractTextPlugin.extract('css-loader'),
+          },
+        ],
       },
       plugins: [
         new ExtractTextPlugin('styles/styles.css'),
@@ -142,7 +148,7 @@ module.exports = {
     return _.extend({
       entry: ENTRY_PATH,
       module: {
-        loaders: [{
+        rules: [{
           test: /\.png/,
           loader: `file-loader?name=${ASSET_FILE_NAME_PATTERN}?publicPath=${ASSET_PATH}&outputPath=${ASSET_OUTPUT_RELATIVE_PATH}`,
         }, {
@@ -192,8 +198,7 @@ module.exports = {
           }
 
           return out;
-        }, []);
-    }).call(this, directory);
+        }, []);    }).call(this, directory);
 
     return res
       .map(file => file.replace(basePath, ''));

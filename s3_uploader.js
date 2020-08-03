@@ -83,7 +83,7 @@ module.exports = class S3Plugin {
     this.options.directory =
       compiler.options.output.path || compiler.options.output.context || '.';
 
-    compiler.plugin('after-emit', (compilation, cb) => {
+    compiler.hooks.afterEmit.tap('S3Plugin', (compilation, cb) => {
       if (!hasRequiredUploadOpts) {
         const error = `S3Plugin-RequiredS3UploadOpts: ${REQUIRED_S3_UP_OPTS.join(', ')}`;
         handleErrors(error, compilation, cb);
