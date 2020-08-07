@@ -48,6 +48,6 @@
     "mocha": "^5.2.0",
     "raw-loader": "^0.5.1",
     "sinon": "^2.2.0",
-    "webpack": "^3.11.0"
+    "webpack": "^5.0.0-beta.24"
   }
 }
