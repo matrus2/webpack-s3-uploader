@@ -21,7 +21,7 @@ describe('S3 Webpack Upload', () => {
       testHelpers.createOutputPath();
     });
 
-    it.only('uploads entire directory to s3', () => { // eslint-disable-line
+    it('uploads entire directory to s3', () => { // eslint-disable-line
       return testHelpers.runWebpackConfig({ config })
         .then(testHelpers.testForFailFromDirectoryOrGetS3Files(testHelpers.OUTPUT_PATH))
         .then(assertFileMatches);
