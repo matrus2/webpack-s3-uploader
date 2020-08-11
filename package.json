@@ -30,7 +30,6 @@
   },
   "homepage": "https://github.com/matrus2/webpack-s3-uploader",
   "dependencies": {
-    "@chakra-ui/layout": "^1.0.0-next.3",
     "aws-sdk": "^2.469.0",
     "lodash": "^4.17.14",
     "progress": "^2.0.3",

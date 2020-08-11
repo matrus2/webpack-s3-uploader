@@ -86,6 +86,7 @@ module.exports = {
   testForFailFromDirectoryOrGetS3Files(directory, bPath = '') {
     return ({ errors }) => {
       const basePath = this.addSlashToPath(`${directory}`);
+      console.log(errors)
 
       if (errors) {
         return assert.fail([], errors, createBuildFailError(errors));
