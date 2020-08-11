@@ -7,7 +7,7 @@ const s3Opts = require('./s3_options');
 const S3WebpackPlugin = require('../s3_uploader');
 const { assert } = require('chai');
 const { spawnSync } = require('child_process');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const S3_URL = s3Opts.AWS_S3_URL;
 const S3_ERROR_REGEX = /<Error>/;
@@ -129,12 +129,12 @@ module.exports = {
           },
           {
             test: /\.css$/,
-            loader: ExtractTextPlugin.extract('css-loader'),
+            use: [MiniCssExtractPlugin.loader, 'css-loader'],
           },
         ],
       },
       plugins: [
-        new ExtractTextPlugin('styles/styles.css'),
+        new MiniCssExtractPlugin(),
         generateS3Config(s3Config),
       ],
       output: {
@@ -153,11 +153,11 @@ module.exports = {
           loader: `file-loader?name=${ASSET_FILE_NAME_PATTERN}?publicPath=${ASSET_PATH}&outputPath=${ASSET_OUTPUT_RELATIVE_PATH}`,
         }, {
           test: /\.css$/,
-          loader: ExtractTextPlugin.extract('css-loader'),
+          use: [MiniCssExtractPlugin.loader, 'css-loader'],
         }],
       },
       plugins: [
-        new ExtractTextPlugin('styles/styles.css'),
+        new MiniCssExtractPlugin(),
         generateS3Config(s3Config),
       ],
       output: {
