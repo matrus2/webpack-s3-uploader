@@ -9,7 +9,7 @@ This will upload all compiled assets to AWS S3 bucket during a webpack build pro
 ### Installation
 
 ```
-$ npm i -S webpack-s3-uploader
+$ npm i -S webpack-s3-uploader-webpack5
 ```
 
 ### How to use it 
