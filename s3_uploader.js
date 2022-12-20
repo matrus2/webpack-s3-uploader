@@ -11,17 +11,17 @@ const DEFAULT_UPLOAD_OPTIONS = {
 
 const REQUIRED_S3_UP_OPTS = ['Bucket'];
 
-const addTrailingS3Sep = fPath => // eslint-disable-line no-confusing-arrow
-  fPath ? fPath.replace(/\/?(\?|#|$)/, '/$1') : fPath;
+// eslint-disable-next-line
+const addTrailingS3Sep = fPath => fPath ? fPath.replace(/\/?(\?|#|$)/, '/$1') : fPath;
 
 const testRule = (rule, subject) => {
   if (_.isRegExp(rule)) {
     return rule.test(subject);
-  } else if (_.isFunction(rule)) {
+  } if (_.isFunction(rule)) {
     return !!rule(subject);
-  } else if (_.isArray(rule)) {
+  } if (_.isArray(rule)) {
     return _.every(rule, condition => testRule(condition, subject));
-  } else if (_.isString(rule)) {
+  } if (_.isString(rule)) {
     return new RegExp(rule).test(subject);
   }
   throw new Error('Invalid include / exclude rule');
@@ -29,25 +29,16 @@ const testRule = (rule, subject) => {
 
 const handleErrors = (error, compilation) => {
   compilation.errors.push(new Error(error));
+  // eslint-disable-next-line
+  console.error(`Error during compilation ${error}`);
 };
 
-const displayErrors = () => {
-  if (compilation.errors.length) {
-    compilation.error.each((item) => {
-      console.error(`Error during compilation ${item}`);
-    });
-  }
-}
-
-const isIgnoredFile = file =>
-  _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
+const isIgnoredFile = file => _.some(UPLOAD_IGNORES, ignore => new RegExp(ignore).test(file));
 
 const getAssetFiles = ({ assets }) => {
-  const files = _.map(assets, (value, name) => ({
+  const files = _.map(assets, (_value, name) => ({
     name,
-    path: value.existsAt,
   }));
-
   return Promise.resolve(files);
 };
 
@@ -81,14 +72,12 @@ module.exports = class S3Plugin {
   }
 
   apply(compiler) {
-    this.connect();
     const hasRequiredUploadOpts = _.every(
       REQUIRED_S3_UP_OPTS,
       type => this.uploadOptions[type],
     );
 
-    this.options.directory =
-      compiler.options.output.path || compiler.options.output.context || '.';
+    this.options.directory = compiler.options.output.path || compiler.options.output.context || '.';
 
     compiler.hooks.afterEmit.tap('S3Plugin', (compilation) => {
       if (!hasRequiredUploadOpts) {
@@ -96,11 +85,12 @@ module.exports = class S3Plugin {
         handleErrors(error, compilation);
       }
 
+      this.connect();
+
       getAssetFiles(compilation)
         .then(files => this.filterAllowedFiles(files))
         .then(files => this.uploadFiles(files))
         .then(() => this.invalidateCloudfront())
-        .then(() => this.displayErrors())
         .catch(e => handleErrors(e, compilation));
     });
   }
@@ -137,8 +127,7 @@ module.exports = class S3Plugin {
     const progressAmount = Array(uploadFiles.length);
     const progressTotal = Array(uploadFiles.length);
     let progressTracker = 0;
-    const calculateProgress = () =>
-      _.sum(progressAmount) / _.sum(progressTotal);
+    const calculateProgress = () => _.sum(progressAmount) / _.sum(progressTotal);
     const countUndefined = array =>
       _.reduce(array, (res, value) => (res += _.isUndefined(value) ? 1 : 0), 0); // eslint-disable-line
 
@@ -164,8 +153,7 @@ module.exports = class S3Plugin {
   }
 
   uploadFiles(files = []) {
-    const uploadFiles = files.map(file =>
-      this.uploadFile(file.name, file.path));
+    const uploadFiles = files.map(file => this.uploadFile(file.name));
 
     if (this.options.progress) {
       this.setupProgressBar(uploadFiles);
@@ -174,7 +162,7 @@ module.exports = class S3Plugin {
     return Promise.all(uploadFiles.map(({ promise }) => promise));
   }
 
-  uploadFile(fileName, file) {
+  uploadFile(fileName) {
     /*
          * assets not output to the webpack config output dir will have relative file name format, and ../ will crash the uploader
          * so we need to scrub them out
@@ -183,14 +171,11 @@ module.exports = class S3Plugin {
          *          file-loader produced output: dist/assets/someimage.png
          *          fileName:                    ../assets/someimage.png
          */
-    // eslint-disable-next-line no-param-reassign
-    fileName = fileName.split('../').join('');
-
-    let Key = this.options.basePath + fileName;
+    let Key = fileName;
     const s3Params = _.mapValues(
       this.uploadOptions,
-      optionConfig => // eslint-disable-line no-confusing-arrow
-        _.isFunction(optionConfig) ? optionConfig(fileName, file) : optionConfig,
+      // eslint-disable-next-line
+      optionConfig => _.isFunction(optionConfig) ? optionConfig(fileName, file) : optionConfig,
     );
 
     // avoid noname folders in bucket
@@ -204,14 +189,15 @@ module.exports = class S3Plugin {
     }
 
     const upload = this.client.uploadFile({
-      localFile: file,
+      localFile: this.options.basePath + Key,
       s3Params: _.merge({ Key }, DEFAULT_UPLOAD_OPTIONS, s3Params),
     });
 
     const promise = new Promise((resolve, reject) => {
-      upload.on('error', err =>
-        reject(`failed uplaoding file: ${file} with Key ${Key} err: ${err}`)); // eslint-disable-line prefer-promise-reject-errors
-      upload.on('end', () => resolve(file));
+      upload.on('error', err => reject(`failed uploading file: ${fileName} with Key ${Key} err: ${err}`)); // eslint-disable-line prefer-promise-reject-errors
+      upload.on('end', () => {
+        resolve(fileName);
+      });
     });
 
     return { upload, promise };
@@ -246,7 +232,7 @@ module.exports = class S3Plugin {
           },
           (err, res) => {
             if (err) {
-              console.log(`\n[ERROR] error creating cloudfront invalidation:  ${err}`); // eslint-disable-line no-console
+              console.error(`\n[ERROR] error creating cloudfront invalidation:  ${err}`); // eslint-disable-line no-console
             }
             err ? reject(err) : resolve(res.Id); // eslint-disable-line no-unused-expressions
           },
